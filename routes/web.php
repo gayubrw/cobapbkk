@@ -9,7 +9,7 @@ Route::get('/', function(){
 });
 
 Route::prefix('/pertemuan1')->group(function(){
- Route::match(['get', 'post'], '/genap-ganjil', [Pertemuan1Controller::class, 'genapGanjil'])->name('genap-ganjil');
+ Route::get('/genap-ganjil', [Pertemuan1Controller::class, 'genapGanjil'])->name('genap-ganjil');
  Route::get('/fibbonaci',[Pertemuan1Controller::class,'fibonacci'])->name('fibonacci');
  Route::get('/prima', [Pertemuan1Controller::class, 'bilanganPrima'])->name('bilangan-prima');
  Route::get('/param', fn() => view('pertemuan1.param'))->name('param');
