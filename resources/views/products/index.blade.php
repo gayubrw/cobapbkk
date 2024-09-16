@@ -5,15 +5,17 @@
     <div class="py-8">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-semibold text-white">Semua Produk</h2>
+            @can('create', App\Models\Product::class)
             <a href="{{ route('products.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 Tambah Produk
             </a>
+            @endcan
         </div>
 
         <!-- Form Pencarian -->
         <form action="{{ route('products.index') }}" method="GET" class="mb-4">
             <div class="flex items-center">
-                <input type="text" name="search" id="search" value="{{ $search }}" placeholder="Cari Produk" 
+                <input type="text" name="search" id="search" value="{{ $search ?? '' }}" placeholder="Cari Produk" 
                     class="w-full px-3 py-2 bg-gray-800 text-white border border-gray-700 rounded-l placeholder-gray-500 focus:text-black focus:bg-white focus:outline-none transition duration-150 ease-in-out">
                 <button type="submit" id="searchButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-r">
                     Cari
@@ -43,10 +45,12 @@
                         @endif
                     </div>
                 </a>
+                @can('update', $product)
                 <div class="absolute top-2 right-2 space-x-2">
                     <a href="{{ route('products.edit', $product->id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-3 rounded text-xs">
                         Edit
                     </a>
+                    @can('delete', $product)
                     <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="inline">
                         @csrf
                         @method('DELETE')
@@ -54,7 +58,9 @@
                             Hapus
                         </button>
                     </form>
+                    @endcan
                 </div>
+                @endcan
             </div>
             @endforeach
         </div>

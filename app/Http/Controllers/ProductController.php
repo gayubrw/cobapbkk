@@ -7,40 +7,36 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('admin')->except(['index', 'show']);
+    }
+
     public function index(Request $request)
     {
-        // Ambil kata kunci pencarian dari query string
         $search = $request->input('search');
+        $products = Product::when($search, function ($query) use ($search) {
+            return $query->where('name', 'like', "%{$search}%");
+        })->paginate(8);
 
-        // Query produk berdasarkan kata kunci pencarian dan dengan pagination
-        $products = Product::where('name', 'like', "%{$search}%")
-                            ->orWhere('status', 'like', "%{$search}%")
-                            ->paginate(8);
+        if ($request->ajax()) {
+            return response()->json([
+                'products' => view('products.partials.product-list', compact('products'))->render(),
+                'pagination' => $products->links()->toHtml()
+            ]);
+        }
 
-        // Tambahkan query string ke pagination link agar tetap terhubung saat paging
-        $products->appends(['search' => $search]);
-        
         return view('products.index', compact('products', 'search'));
     }
 
     public function create()
     {
-        return view('products.create');
+        return view('products.create') ;
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required|integer',
-            'stock' => 'required|integer',
-            'status' => 'required',
-            'image_url' => 'nullable|url',
-        ]);
-
-        Product::create($request->all());
-
-        return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
+        // Logika untuk menyimpan produk
     }
 
     public function edit(Product $product)
@@ -50,30 +46,16 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required|integer',
-            'stock' => 'required|integer',
-            'status' => 'required',
-            'image_url' => 'nullable|url',
-        ]);
-
-        $product->update($request->all());
-
-        return redirect()->route('products.index')->with('success', 'Produk berhasil diperbarui.');
+        // Logika untuk memperbarui produk
     }
 
     public function destroy(Product $product)
     {
-        $product->delete();
-
-        return redirect()->route('products.index')->with('success', 'Produk berhasil dihapus.');
+        // Logika untuk menghapus produk
     }
 
-        public function show(Product $product)
+    public function show(Product $product)
     {
         return view('products.show', compact('product'));
     }
-    
 }
-

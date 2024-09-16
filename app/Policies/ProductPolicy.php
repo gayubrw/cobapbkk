@@ -2,35 +2,42 @@
 
 namespace App\Policies;
 
-use App\Models\User;
 use App\Models\Product;
-use Illuminate\Auth\Access\HandlesAuthorization;
+use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
 class ProductPolicy
 {
-    use HandlesAuthorization;
-
-    public function create(User $user)
+    public function before(User $user, $ability)
     {
-        // Hanya user dengan peran 'admin' yang dapat menambah produk
-        return $user->role === 'admin';
+        // Ganti 'admin@example.com' dengan email akun admin Anda
+        if ($user->email === 'admin@gmail.com') {
+            return true;
+        }
     }
 
-    public function update(User $user, Product $product)
+    public function viewAny(User $user): bool
     {
-        // Hanya user dengan peran 'admin' yang dapat mengedit produk
-        return $user->role === 'admin';
-    }
-
-    public function delete(User $user, Product $product)
-    {
-        // Hanya user dengan peran 'admin' yang dapat menghapus produk
-        return $user->role === 'admin';
-    }
-
-    public function viewAny(User $user)
-    {
-        // Semua user dapat melihat daftar produk
         return true;
     }
-}
+
+    public function view(User $user, Product $product): bool
+    {
+        return true;
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->isAdmin();
+    }
+
+    public function update(User $user, Product $product): bool
+    {
+        return $user->isAdmin();
+    }
+
+    public function delete(User $user, Product $product): bool
+    {
+        return $user->isAdmin();
+    }
+}   
